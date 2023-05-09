@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "924797992456",
+    "project_id": "energylive-7f5c0",
+    "storage_bucket": "energylive-7f5c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924797992456:android:1b14582501af08b0a2dbbd",
+        "android_client_info": {
+          "package_name": "com.example.energylive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924797992456-10jcml963m3onvsls870viorvigkmirj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB40Zhhkq5ERASp5ZlixsWfZT52tHGC6ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "924797992456-10jcml963m3onvsls870viorvigkmirj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
