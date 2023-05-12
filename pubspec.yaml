@@ -38,6 +38,8 @@ dependencies:
   firebase_messaging: ^14.5.0
   cloud_firestore: ^4.6.0
   http: ^0.13.6
+  syncfusion_flutter_gauges: ^21.2.4
+
   
 
 

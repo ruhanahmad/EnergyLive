@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:energylive/classes/dartClasses.dart';
+import 'package:energylive/classes/dartClasses.dart' as model;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart' as mt;
-
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class MyWidget extends StatefulWidget {
   @override
@@ -11,63 +11,151 @@ class MyWidget extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
+  model.Device? _device;
+  bool isLoading = true;
   // List<device> devicesx = [];
-  Future <Device> _fetchData() async {
-    final response = await http.get(Uri.parse('http://209.97.164.239:8080/c3WBIWiUzVlW-WkH_97eZmLCY507bnc7/project'));
-if (response.statusCode == 200) {
-    final Map<String, dynamic> json = jsonDecode(response.body);
-    return Device.fromJson(json);
-  } else {
-    throw Exception('Failed to load user');
+  Future<model.Device> _fetchData() async {
+    final response = await http.get(Uri.parse(
+        'http://209.97.164.239:8080/c3WBIWiUzVlW-WkH_97eZmLCY507bnc7/project'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> json = jsonDecode(response.body);
+
+      _device = model.Device.fromJson(json);
+
+      setState(() {
+        widgets = _device!.widgets;
+        tabs = widgets!.firstWhere((element) => element.type == "TABS").tabs;
+        tabController = TabController(length: tabs!.length, vsync: this);
+        isLoading = false;
+      });
+      return model.Device.fromJson(json);
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
+
+  TabController? tabController;
+  List<model.Widge>? widgets;
+  List<model.Tab>? tabs;
+  @override
+  void initState() {
+    _fetchData();
+    super.initState();
   }
-var tabController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Widget'),
       ),
-      body: FutureBuilder<Device>(
-        future: _fetchData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('${snapshot.error}'),
-              );
-              }
-            final datassss = snapshot.data!;
-                       var data = datassss.widgets.first;  
-                  print(data.tabs!.length);
-                  tabController = TabController(length: data.tabs!.length, vsync: this);
-//y kya bnana tha ?
-//tabbar baki isko style jo bhi karna hay chat gpt se karwai jao araam se
-//woww acha mjy btana k ya single ticker mixin ka kya use h q use kia yaha py
-// animtion k liye jo tab select karna per animation hoti hhay thek hay hogya or koi masla to nai ? OK ALLAH HAFIZ
-//bh msla nh ab mai dykhti hu na thanks a lot
-                  return TabBar(
-                    labelColor: Colors.black,
-                                controller: tabController,
-                          tabs:List.from(data.tabs!.map((e) => mt.Tab(
-                            text:  e.label,
-                            )))
-                                
-                                );
-                
-                
-     
-          } 
-          else {
-            return Center(
+      body: isLoading
+          ? Center(
               child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+            )
+          : Builder(builder: (context) {
+              return ListView(
+                children: [
+                  TabBar(
+                    onTap: (index) {
+                      print("iddd");
+                      print(index);
+                      setState(() {});
+                    },
+                    labelColor: Colors.black,
+                    controller: tabController,
+                    tabs: List.from(
+                      tabs!.map(
+                        (e) => mt.Tab(
+                          text: e.label,
+                          // child: Text(e.id.toString()),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 200,
+                              childAspectRatio: 3 / 2,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 20),
+                      itemCount: widgets!
+                          .where((element) =>
+                              element.tabId == tabController!.index)
+                          .toList()
+                          .length,
+                      itemBuilder: (context, index) {
+                        var tab = widgets!
+                            .where((element) =>
+                                element.tabId == tabController!.index)
+                            .toList()[index];
+                        if (tab.type == "GAUGE") {
+                          return Container(
+                            height: 200,
+                            width: 200,
+                            child: SfRadialGauge(
+                              axes: <RadialAxis>[
+                                RadialAxis(
+                                  minimum: 0,
+                                  maximum: 100,
+                                  ranges: <GaugeRange>[
+                                    GaugeRange(
+                                      startValue: 0,
+                                      endValue: 30,
+                                      color: Colors.red,
+                                    ),
+                                    GaugeRange(
+                                      startValue: 30,
+                                      endValue: 70,
+                                      color: Colors.yellow,
+                                    ),
+                                    GaugeRange(
+                                      startValue: 70,
+                                      endValue: 100,
+                                      color: Colors.green,
+                                    ),
+                                  ],
+                                  pointers: <GaugePointer>[
+                                    NeedlePointer(
+                                      value:double.tryParse( tab.pin.toString()) ??0,
+                                      enableAnimation: true,
+                                    ),
+                                  ],
+                                  annotations: <GaugeAnnotation>[
+                                    GaugeAnnotation(
+                                      //baki widget bhi aise bnao saray widget if laga kar
+                                      widget: Text(
+                                        '${double.tryParse( tab.pin.toString()) ??0}',
+                                        style:const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      positionFactor: 0.5,
+                                      angle: 90,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        //smajh aai ? nh ae
+                        if(tab.type=="LABELED_VALUE_DISPLAY")
+                        {
+
+                          return Text("${tab.pin}");
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }),
     );
   }
 }
-
-
-

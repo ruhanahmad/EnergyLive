@@ -592,7 +592,10 @@ class Condition {
         "value": value,
     };
 }
-
+//ye jo kaam hay yeh bohat bara hay ismen har widget alag generate hona hay uski aik aik details likhi hain 
+//text alignment etc .. 
+// nh hm ny bs kch graphs show krny h zruri nh widgets ki alingment size jo b mention h vysa same ho,hm ny bs
+//kch data show krvana h grahs vgyra mai han wohi bta raha hun
 class Tab {
     int id;
     String label;
